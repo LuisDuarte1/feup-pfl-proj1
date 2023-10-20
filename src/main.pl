@@ -1,4 +1,10 @@
 
+% List access
+nth_list([H| List], 0, Out) :- Out=H.
+nth_list([H| List], Index, Out) :- 
+    NewIndex is Index-1,
+    nth_list(List, NewIndex, Out).
+
 /*
  board:
     -1 -> not a valid space
@@ -12,7 +18,7 @@
     6-10-> blue
 */
 
-
+% -Board
 init_board(Board) :- append([],[
         [-1,-1,-1,-1, 0, 0,-1,-1,-1,-1,-1], 
         [-1, 1, 0, 1, 0, 0, 0, 6, 0, 6,-1], 
@@ -25,7 +31,8 @@ init_board(Board) :- append([],[
 
 
 
-
+% +Board +Q +R -Piece
+get_board_piece(Board, Q, R, Piece) :- nth_list(Board, R, Row), nth_list(Row, Q, Piece).
 
 
 
