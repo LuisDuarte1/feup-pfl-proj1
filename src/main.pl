@@ -35,7 +35,16 @@ init_board(Board) :- append([],[
 get_board_piece(Board, Q, R, Piece) :- nth_list(Board, R, Row), nth_list(Row, Q, Piece).
 
 
+% +Piece, -NormalizedPiece
+normalize_board_piece(Piece, NormalizedPiece) :- Piece > 5,
+                                                NormalizedPiece is Piece - 5.
+normalize_board_piece(Piece, NormalizedPiece) :- Piece =< 5,
+                                                NormalizedPiece is Piece.
 
 
+% we use the axial cordinate system offseted with the rows offseted to 
+% the middle so that the hexagon input is more intuitive
 
-        
+% +Q, +R, -AxialQ, -AxialR
+convert_offset_to_axial(Q,R, AxialQ, AxialR) :- AxialR is -(R-3),
+                                                AxialQ is Q - (AxialR - (AxialR /\ 1)) // 2.
