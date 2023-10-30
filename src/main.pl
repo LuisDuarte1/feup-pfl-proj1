@@ -61,28 +61,38 @@ convert_axial_to_offset(AxialQ, AxialR, Q, R) :-    R is -AxialR+3,
 % s2 - attacker can attack but is also eaten = 0
 % s3 - attacker cannot attack = -1
 
-% +attackerValue, +defenderValue
+% +attackerValue, +defenderValue, -state
 
 % circle attack
-attack_checker(1,1) :- 1.
-attack_checker(1,3) :- 1.
-attack_checker(1,4) :- 1.
-attack_checker(1,5) :- 1.
+attack_checker(1,1, 1).
+attack_checker(1,3, 1).
+attack_checker(1,4, 1).
+attack_checker(1,5, 1).
 
 % triangle attack
-attack_checker(3,1) :- 0.
-attack_checker(3,3) :- 1.
-attack_checker(3,4) :- 1.
-attack_checker(3,5) :- 1.
+attack_checker(3,1, 0).
+attack_checker(3,3, 1).
+attack_checker(3,4, 1).
+attack_checker(3,5, 1).
 
 % square attack
-attack_checker(4,1) :- -1.
-attack_checker(4,3) :- 0.
-attack_checker(4,4) :- 1.
-attack_checker(4,5) :- 1.
+attack_checker(4,1, -1).
+attack_checker(4,3, 0).
+attack_checker(4,4, 1).
+attack_checker(4,5, 1).
 
 % pentagon attack
-attack_checker(5,1) :- -1.
-attack_checker(5,3) :- -1.
-attack_checker(5,4) :- -1.
-attack_checker(5,5) :- 1.
+attack_checker(5,1, -1).
+attack_checker(5,3, -1).
+attack_checker(5,4, -1).
+attack_checker(5,5, 1) .
+
+% distance function
+% +AxialQ1 +AxialR1 +AxialQ2 +AxialR2 -Distance
+distance_axial(AxialQ1, AxialR1, AxialQ2, AxialR2, Distance) :- AxialS1 is -AxialQ1-AxialR1,
+                                                                AxialS2 is -AxialQ2-AxialR2,
+                                                                Distance is (abs(AxialQ1 - AxialQ2) + abs(AxialR1 - AxialR2) + abs(AxialS1 - AxialS2))//2.
+% +Q1 +R1 +Q2 +R2 -Distance
+distance_offset(Q1,R1,Q2,R2,Distance) :-    convert_offset_to_axial(Q1,R1,AxialQ1,AxialR1),
+                                            convert_offset_to_axial(Q2,R2,AxialQ2,AxialR2),
+                                            distance_axial(AxialQ1,AxialR1,AxialQ2,AxialR2,Distance).
