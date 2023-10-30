@@ -46,5 +46,10 @@ normalize_board_piece(Piece, NormalizedPiece) :- Piece =< 5,
 % the middle so that the hexagon input is more intuitive
 
 % +Q, +R, -AxialQ, -AxialR
-convert_offset_to_axial(Q,R, AxialQ, AxialR) :- AxialR is -(R-3),
+convert_offset_to_axial(Q,R, AxialQ, AxialR) :- AxialR is -R+3,
                                                 AxialQ is Q - (AxialR - (AxialR /\ 1)) // 2.
+
+
+% +AxialQ, +AxialR, Q, R
+convert_axial_to_offset(AxialQ, AxialR, Q, R) :-    R is -AxialR+3,
+                                                    Q is AxialQ + (AxialR - (AxialR /\ 1)) // 2.
