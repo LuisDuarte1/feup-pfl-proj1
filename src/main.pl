@@ -1,3 +1,5 @@
+% import board facts and display rules
+:- ['board.pl'].
 
 % List access
 nth_list([H| List], 0, Out) :- Out=H.
@@ -85,7 +87,10 @@ attack_checker(4,5, 1).
 attack_checker(5,1, -1).
 attack_checker(5,3, -1).
 attack_checker(5,4, -1).
-attack_checker(5,5, 1) .
+attack_checker(5,5, 1).
+
+% generic attack checker for empty slot, we assume that it "eats" nothing and it's not eaten on the process
+attack_checker(X,0,1).
 
 % distance function
 % +AxialQ1 +AxialR1 +AxialQ2 +AxialR2 -Distance
@@ -96,3 +101,29 @@ distance_axial(AxialQ1, AxialR1, AxialQ2, AxialR2, Distance) :- AxialS1 is -Axia
 distance_offset(Q1,R1,Q2,R2,Distance) :-    convert_offset_to_axial(Q1,R1,AxialQ1,AxialR1),
                                             convert_offset_to_axial(Q2,R2,AxialQ2,AxialR2),
                                             distance_axial(AxialQ1,AxialR1,AxialQ2,AxialR2,Distance).
+
+
+% commit_piece takes two coordinates, the attack state and board and acts accordingly
+% this assumes offset coordinates.
+% TODO(luisd): make commit pieces
+% eats both, so we set both points to 0
+commit_piece(Board, QFrom, Rfrom, Qto, Rto, 0) :- . 
+
+% eats only the destination coordinate, so we set the destination to 0
+commit_piece(Board, QFrom, Rfrom, Qto, Rto, 1) :- . 
+
+% move_piece will check all rules above to see if it's able the piece and make the move if possible
+% this assumes that Q and R are in Axial form. ReturnCode is 0 on success or -1 on failure
+% +Qfrom +Rfrom +Qto +Rto
+move_piece(Board, QFrom, RFrom, QTo, RTo) :-    
+    convert_axial_to_offset(QFrom, RFrom, OffsetQFrom, OffsetRFrom),
+    convert_axial_to_offset(QTo, RTo, OffsetQTo, OffsetRTo),
+    get_board_piece(Board, OffsetQFrom, OffsetRFrom, Piece),
+    Piece > 0,
+    get_board_piece(Board, OffsetQTo, OffsetRTo, DestinationPiece),
+    Piece > -1,
+    normalize_board_piece(Piece, NormalizedPiece),
+    normalize_board_piece(DestinationPiece, DestinationNormalizedPiece),
+    attack_checker(NormalizedPiece, DestinationNormalizedPiece, State),
+    State > -1,
+    commit_piece(Board, OffsetQFrom, OffsetRFrom, OffsetQTo, OffsetRTo, State).
