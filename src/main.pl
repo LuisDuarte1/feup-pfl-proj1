@@ -7,6 +7,14 @@ nth_list([H| List], Index, Out) :-
     NewIndex is Index-1,
     nth_list(List, NewIndex, Out).
 
+% List mutation
+
+replace_list(0, NewValue, [_ | List], [NewValue | List]).
+replace_list(Index, NewValue, [Head | List], [Head | NewList]) :- 
+    Index > 0, 
+    NewIndex is Index-1,
+    replace_list(NewIndex, NewValue, List, NewList).
+
 /*
  board:
     -1 -> not a valid space
@@ -105,17 +113,34 @@ distance_offset(Q1,R1,Q2,R2,Distance) :-    convert_offset_to_axial(Q1,R1,AxialQ
 
 % commit_piece takes two coordinates, the attack state and board and acts accordingly
 % this assumes offset coordinates.
-% TODO(luisd): make commit pieces
 % eats both, so we set both points to 0
-commit_piece(Board, QFrom, Rfrom, Qto, Rto, 0) :- . 
+commit_piece(Board, QFrom, RFrom, QTo, RTo, 0, NewBoard) :-
+    % in the source hexagon we replace it 0
+    nth_list(Board, RFrom, FromRow),
+    replace_list(QFrom, 0, FromRow, FromNewRow),
+    replace_list(RFrom, FromNewRow, Board, InterBoard),
+    % in the destination hexagon we replace it to 0
+    nth_list(Board, RTo, ToRow),
+    replace_list(QTo, 0, ToRow, ToNewRow),
+    replace_list(RTo, ToNewRow, InterBoard, NewBoard).
 
-% eats only the destination coordinate, so we set the destination to 0
-commit_piece(Board, QFrom, Rfrom, Qto, Rto, 1) :- . 
+% eats only the destination coordinate, so we set the source to 0 and the destination to the piece value
+commit_piece(Board, QFrom, RFrom, QTo, RTo, 1, NewBoard) :-
+    get_board_piece(Board, QFrom, RFrom, Piece),
+    % in the source hexagon we replace it 0
+    nth_list(Board, RFrom, FromRow),
+    replace_list(QFrom, 0, FromRow, FromNewRow),
+    replace_list(RFrom, FromNewRow, Board, InterBoard),
+    % in the destination hexagon we replace it with the piece value
+    nth_list(Board, RTo, ToRow),
+    replace_list(QTo, Piece, ToRow, ToNewRow),
+    replace_list(RTo, ToNewRow, InterBoard, NewBoard).
+
 
 % move_piece will check all rules above to see if it's able the piece and make the move if possible
 % this assumes that Q and R are in Axial form. ReturnCode is 0 on success or -1 on failure
 % +Qfrom +Rfrom +Qto +Rto
-move_piece(Board, QFrom, RFrom, QTo, RTo) :-    
+move_piece(Board, QFrom, RFrom, QTo, RTo, ReturnCode, NewBoard) :-    
     convert_axial_to_offset(QFrom, RFrom, OffsetQFrom, OffsetRFrom),
     convert_axial_to_offset(QTo, RTo, OffsetQTo, OffsetRTo),
     get_board_piece(Board, OffsetQFrom, OffsetRFrom, Piece),
@@ -126,4 +151,8 @@ move_piece(Board, QFrom, RFrom, QTo, RTo) :-
     normalize_board_piece(DestinationPiece, DestinationNormalizedPiece),
     attack_checker(NormalizedPiece, DestinationNormalizedPiece, State),
     State > -1,
-    commit_piece(Board, OffsetQFrom, OffsetRFrom, OffsetQTo, OffsetRTo, State).
+    commit_piece(Board, OffsetQFrom, OffsetRFrom, OffsetQTo, OffsetRTo, State, NewBoard),
+    ReturnCode is 0,
+    !.
+move_piece(Board, QFrom, Rfrom, QTo, Rto, ReturnCode) :- 
+    ReturnCode is -1.
