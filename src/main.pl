@@ -140,19 +140,16 @@ commit_piece(Board, QFrom, RFrom, QTo, RTo, 1, NewBoard) :-
 % move_piece will check all rules above to see if it's able the piece and make the move if possible
 % this assumes that Q and R are in Axial form. ReturnCode is 0 on success or -1 on failure
 % +Qfrom +Rfrom +Qto +Rto
-move_piece(Board, QFrom, RFrom, QTo, RTo, ReturnCode, NewBoard) :-    
+move_piece(Board, QFrom, RFrom, QTo, RTo, NewBoard) :-    
     convert_axial_to_offset(QFrom, RFrom, OffsetQFrom, OffsetRFrom),
     convert_axial_to_offset(QTo, RTo, OffsetQTo, OffsetRTo),
     get_board_piece(Board, OffsetQFrom, OffsetRFrom, Piece),
     Piece > 0,
     get_board_piece(Board, OffsetQTo, OffsetRTo, DestinationPiece),
-    Piece > -1,
+    DestinationPiece > -1,
+    (abs(Piece-DestinationPiece) >= 5; DestinationPiece = 0),
     normalize_board_piece(Piece, NormalizedPiece),
     normalize_board_piece(DestinationPiece, DestinationNormalizedPiece),
     attack_checker(NormalizedPiece, DestinationNormalizedPiece, State),
     State > -1,
-    commit_piece(Board, OffsetQFrom, OffsetRFrom, OffsetQTo, OffsetRTo, State, NewBoard),
-    ReturnCode is 0,
-    !.
-move_piece(Board, QFrom, Rfrom, QTo, Rto, ReturnCode) :- 
-    ReturnCode is -1.
+    commit_piece(Board, OffsetQFrom, OffsetRFrom, OffsetQTo, OffsetRTo, State, NewBoard).
