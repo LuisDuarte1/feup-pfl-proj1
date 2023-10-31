@@ -114,6 +114,7 @@ distance_offset(Q1,R1,Q2,R2,Distance) :-    convert_offset_to_axial(Q1,R1,AxialQ
 % commit_piece takes two coordinates, the attack state and board and acts accordingly
 % this assumes offset coordinates.
 % eats both, so we set both points to 0
+% +Board +QFrom +RFrom, +QTo, +RTo, +State, -NewBoard
 commit_piece(Board, QFrom, RFrom, QTo, RTo, 0, NewBoard) :-
     % in the source hexagon we replace it 0
     nth_list(Board, RFrom, FromRow),
@@ -139,7 +140,7 @@ commit_piece(Board, QFrom, RFrom, QTo, RTo, 1, NewBoard) :-
 
 % move_piece will check all rules above to see if it's able the piece and make the move if possible
 % this assumes that Q and R are in Axial form. ReturnCode is 0 on success or -1 on failure
-% +Qfrom +Rfrom +Qto +Rto
+% +Board +Qfrom +Rfrom +Qto +Rto -NewBoard
 move_piece(Board, QFrom, RFrom, QTo, RTo, NewBoard) :-    
     convert_axial_to_offset(QFrom, RFrom, OffsetQFrom, OffsetRFrom),
     convert_axial_to_offset(QTo, RTo, OffsetQTo, OffsetRTo),
