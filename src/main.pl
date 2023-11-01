@@ -1,5 +1,6 @@
 % import board facts and display rules
 :- ['board.pl'].
+:- ['ui.pl'].
 
 % List access
 nth_list([H| List], 0, Out) :- Out=H.
@@ -15,6 +16,14 @@ replace_list(Index, NewValue, [Head | List], [Head | NewList]) :-
     NewIndex is Index-1,
     replace_list(NewIndex, NewValue, List, NewList).
 
+% List find
+find_list([Element | List], Element).
+find_list([Head | List], Element) :- find_list(List, Element).
+
+% negation of predicate
+neg(Goal) :- Goal,!,fail.
+neg(Goal).
+
 /*
  board:
     -1 -> not a valid space
@@ -27,6 +36,8 @@ replace_list(Index, NewValue, [Head | List], [Head | NewList]) :-
     1-5 -> red
     6-10-> blue
 */
+
+%Board related utils
 
 % -Board
 init_board(Board) :- append([],[
@@ -139,7 +150,7 @@ commit_piece(Board, QFrom, RFrom, QTo, RTo, 1, NewBoard) :-
 
 
 % move_piece will check all rules above to see if it's able the piece and make the move if possible
-% this assumes that Q and R are in Axial form. ReturnCode is 0 on success or -1 on failure
+% this assumes that Q and R are in Axial form.
 % +Board +Qfrom +Rfrom +Qto +Rto -NewBoard
 move_piece(Board, QFrom, RFrom, QTo, RTo, NewBoard) :-    
     convert_axial_to_offset(QFrom, RFrom, OffsetQFrom, OffsetRFrom),
@@ -156,3 +167,55 @@ move_piece(Board, QFrom, RFrom, QTo, RTo, NewBoard) :-
     attack_checker(NormalizedPiece, DestinationNormalizedPiece, State),
     State > -1,
     commit_piece(Board, OffsetQFrom, OffsetRFrom, OffsetQTo, OffsetRTo, State, NewBoard).
+
+% there are two win conditions in this game, a pentagon is eaten or there are two pieces in the
+% "yellow" squares. The yellow square are located at (in offset form, to make lookups easier): 
+% Q5R1 and Q5R5. To make the check easier the predicated is passed a player which has two possible
+% values: 0 for blue (left) and 1 for red (right). It returns 1 if red won, 0 if blue won and -1 if game
+% is still being played.
+
+%find_pentagon -> +Board, +Player
+%first we try to find player 0 pentagon
+find_pentagon(Board, 0) :- nth_list(Board, 0, Row), find_list(Row, 5).
+find_pentagon(Board, 0) :- nth_list(Board, 1, Row), find_list(Row, 5).
+find_pentagon(Board, 0) :- nth_list(Board, 2, Row), find_list(Row, 5).
+find_pentagon(Board, 0) :- nth_list(Board, 3, Row), find_list(Row, 5).
+find_pentagon(Board, 0) :- nth_list(Board, 4, Row), find_list(Row, 5).
+find_pentagon(Board, 0) :- nth_list(Board, 5, Row), find_list(Row, 5).
+find_pentagon(Board, 0) :- nth_list(Board, 6, Row), find_list(Row, 5).
+
+%then we try to find player 1 pentagon
+find_pentagon(Board, 1) :- nth_list(Board, 0, Row), find_list(Row, 10).
+find_pentagon(Board, 1) :- nth_list(Board, 1, Row), find_list(Row, 10).
+find_pentagon(Board, 1) :- nth_list(Board, 2, Row), find_list(Row, 10).
+find_pentagon(Board, 1) :- nth_list(Board, 3, Row), find_list(Row, 10).
+find_pentagon(Board, 1) :- nth_list(Board, 4, Row), find_list(Row, 10).
+find_pentagon(Board, 1) :- nth_list(Board, 5, Row), find_list(Row, 10).
+find_pentagon(Board, 1) :- nth_list(Board, 6, Row), find_list(Row, 10).
+
+%+Board, +Player, -ReturnState
+check_win_condition(Board, 0, ReturnState) :-
+    neg(find_pentagon(Board, 1)),
+    ReturnState is 0.
+
+check_win_condition(Board, 0, ReturnState) :-
+    get_board_piece(Board, 5, 1, TopPiece),
+    TopPiece > 5,
+    get_board_piece(Board, 5, 5, BottomPiece),
+    BottomPiece > 5,
+    ReturnState is 1.
+
+check_win_condition(Board, 1, ReturnState) :-
+    neg(find_pentagon(Board, 0)),
+    ReturnState is 1.
+
+check_win_condition(Board, 1, ReturnState) :-
+    get_board_piece(Board, 5, 1, TopPiece),
+    TopPiece =< 5,
+    get_board_piece(Board, 5, 5, BottomPiece),
+    BottomPiece < 5,
+    ReturnState is 0.
+
+
+check_win_condition(Board, Player, ReturnState) :- ReturnState is -1.
+
