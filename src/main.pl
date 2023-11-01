@@ -1,6 +1,7 @@
 % import board facts and display rules
-:- ['board.pl'].
-:- ['ui.pl'].
+:- ensure_loaded('board.pl').
+:- ensure_loaded('ui.pl').
+:- ensure_loaded('bfs.pl').
 
 % List access
 nth_list([H| List], 0, Out) :- Out=H.
@@ -40,7 +41,7 @@ neg(Goal).
 %Board related utils
 
 % -Board
-init_board(Board) :- append([],[
+init_board(Board) :- Board = [
         [-1,-1,-1,-1, 0, 0,-1,-1,-1,-1,-1], 
         [-1, 1, 0, 1, 0, 0, 0, 6, 0, 6,-1], 
         [ 0, 4, 3, 0, 0, 0, 0, 8, 9, 0,-1], 
@@ -48,7 +49,7 @@ init_board(Board) :- append([],[
         [ 0, 4, 3, 0, 0, 0, 0, 8, 9, 0,-1], 
         [-1, 1, 0, 1, 0, 0, 0, 6, 0, 6,-1], 
         [-1,-1,-1,-1, 0, 0,-1,-1,-1,-1,-1]
-        ], Board).
+        ].
 
 
 
@@ -75,6 +76,10 @@ convert_offset_to_axial(Q,R, AxialQ, AxialR) :- AxialR is -R+3,
 convert_axial_to_offset(AxialQ, AxialR, Q, R) :-    R is -AxialR+3,
                                                     Q is AxialQ + (AxialR - (AxialR /\ 1)) // 2.
 
+% +Board +Q +R -Piece
+get_board_piece_axial(Board, Q, R, Piece) :- 
+    convert_axial_to_offset(Q,R,OffsetQ,OffsetR),
+    get_board_piece(Board, OffsetQ, OffsetR, Piece).
 
 % according to the attack table, described in the report:
 
