@@ -150,6 +150,8 @@ move_piece(Board, QFrom, RFrom, QTo, RTo, NewBoard) :-
     DestinationPiece > -1,
     (abs(Piece-DestinationPiece) >= 5; DestinationPiece = 0),
     normalize_board_piece(Piece, NormalizedPiece),
+    distance_axial(QFrom, RFrom, QTo, RTo, Distance),
+    NormalizedPiece <= Distance,
     normalize_board_piece(DestinationPiece, DestinationNormalizedPiece),
     attack_checker(NormalizedPiece, DestinationNormalizedPiece, State),
     State > -1,
