@@ -18,15 +18,15 @@ filter_adjacent(Board, (Q2,R2), (Qi,Ri)) :- get_board_piece_axial(Board, Qi, Ri,
 
 %in axial form
 check_path_possible(Board, (Q1,R1), (Q2,R2)) :-
-    distance_axial(Board, Q1, R1, Q2, R2, Distance),
-    check_path_possible_bfs(Board, (Q2,R2), Distance, [(Q1,R1)]).
+    distance_axial(Q1, R1, Q2, R2, Distance),
+    check_path_possible_bfs(Board, (Q2,R2), Distance,[], [(Q1,R1)]).
 
 
 %in axial form
 check_path_possible_bfs(_, (Q2,R2), _, _, [(Q2,R2) | _]) :- !.
 check_path_possible_bfs(_, (Q2,R2), 0, _, [(Q1,R1) | _]) :- fail.
 check_path_possible_bfs(Board, (Q2,R2),Distance, Visited, [(Q1,R1) | RestQueue]) :-
-    not(memberchk((Q1,R1), Visited)),
+    neg(memberchk((Q1,R1), Visited)),
     get_adjacent(Board, Q1,R1, AdjacentList),
     NewDistance is Distance-1,
     append([(Q1,R1)], Visited, NewVisited),
