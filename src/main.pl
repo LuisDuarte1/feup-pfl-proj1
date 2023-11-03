@@ -1,7 +1,8 @@
 % import board facts and display rules
-:- ensure_loaded('board.pl').
-:- ensure_loaded('ui.pl').
-:- ensure_loaded('bfs.pl').
+:- consult('board.pl').
+:- consult('bfs.pl').
+:- consult('hexagon.pl').
+:- consult('gamestate.pl').
 
 % List access
 nth_list([H| List], 0, Out) :- Out=H.

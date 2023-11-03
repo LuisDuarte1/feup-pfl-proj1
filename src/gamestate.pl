@@ -1,0 +1,41 @@
+
+
+% Player, Red: 0, Blue: 1
+% Type: Two-player game: 
+% GameState -> (Board, Type, Player)
+
+% +WinCondition, +Player
+stop_game(-1, Player).
+stop_game(Player, Player) :- 
+    write('You won!\n'),
+    fail.
+stop_game(Player1, Player2) :- 
+    write('You lost :/\n'),
+    fail.
+
+invert_player(0, 1).
+invert_player(1, 0).
+
+try_move(Board, Player, NewBoard) :-
+    format('Player ~d plays.\n', [Player]),
+    write('Select the piece you want to move: '),
+    read(IntSourceMove),
+    write('Select the destination tile: '),
+    read(DestMove),
+    coord_to_axial_board(IntSourceMove, Q1, R1),
+    coord_to_axial_board(DestMove, Q2, R2),
+    move_piece(Board, Q1, R1, Q2, R2, NewBoard).
+
+try_move(Board, Player, NewBoard) :- 
+    write('Invalid move try again...\n'),
+    try_move(Board, Player, NewBoard).
+
+% +GameState
+run_game((Board, 0, Player)) :-
+    draw_board(Board),
+    try_move(Board, Player, NewBoard),
+    check_win_condition(Board, Player, WinCondition),
+    stop_game(WinCondition, Player),
+    invert_player(Player, NewPlayer),
+    run_game((NewBoard, 0, NewPlayer))
+    .
