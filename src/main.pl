@@ -117,6 +117,11 @@ attack_checker(5,5, 1).
 % generic attack checker for empty slot, we assume that it "eats" nothing and it's not eaten on the process
 attack_checker(X,0,1).
 
+% piece belongs to player
+belongs_player(0, Piece) :- Piece =< 5.
+belongs_player(1, Piece) :- Piece > 5.
+
+
 % distance function
 % +AxialQ1 +AxialR1 +AxialQ2 +AxialR2 -Distance
 distance_axial(AxialQ1, AxialR1, AxialQ2, AxialR2, Distance) :- AxialS1 is -AxialQ1-AxialR1,
@@ -158,14 +163,15 @@ commit_piece(Board, QFrom, RFrom, QTo, RTo, 1, NewBoard) :-
 % move_piece will check all rules above to see if it's able the piece and make the move if possible
 % this assumes that Q and R are in Axial form.
 % +Board +Qfrom +Rfrom +Qto +Rto -NewBoard
-move_piece(Board, QFrom, RFrom, QTo, RTo, NewBoard) :-    
+move_piece(Board, QFrom, RFrom, QTo, RTo, NewBoard, Player) :-    
     convert_axial_to_offset(QFrom, RFrom, OffsetQFrom, OffsetRFrom),
     convert_axial_to_offset(QTo, RTo, OffsetQTo, OffsetRTo),
     get_board_piece(Board, OffsetQFrom, OffsetRFrom, Piece),
     Piece > 0,
+    belongs_player(Player, Piece),
     get_board_piece(Board, OffsetQTo, OffsetRTo, DestinationPiece),
     DestinationPiece > -1,
-    (abs(Piece-DestinationPiece) >= 5; DestinationPiece = 0),
+    (DestinationPiece = 0; neg(belongs_player(Player, DestinationPiece))),
     normalize_board_piece(Piece, NormalizedPiece),
     distance_axial(QFrom, RFrom, QTo, RTo, Distance),
     NormalizedPiece >= Distance,
@@ -206,9 +212,9 @@ check_win_condition(Board, 0, ReturnState) :-
     ReturnState is 0.
 
 check_win_condition(Board, 0, ReturnState) :-
-    get_board_piece(Board, 5, 1, TopPiece),
+    get_board_piece_axial(Board, 4, 2, TopPiece),
     TopPiece > 5,
-    get_board_piece(Board, 5, 5, BottomPiece),
+    get_board_piece_axial(Board, 6, -2, BottomPiece),
     BottomPiece > 5,
     ReturnState is 1.
 
@@ -217,10 +223,12 @@ check_win_condition(Board, 1, ReturnState) :-
     ReturnState is 1.
 
 check_win_condition(Board, 1, ReturnState) :-
-    get_board_piece(Board, 5, 1, TopPiece),
+    get_board_piece_axial(Board, 4, 2, TopPiece),
+    TopPiece > 0,
     TopPiece =< 5,
-    get_board_piece(Board, 5, 5, BottomPiece),
-    BottomPiece < 5,
+    get_board_piece_axial(Board, 6, -2, BottomPiece),
+    BottomPiece > 0,
+    BottomPiece =< 5,
     ReturnState is 0.
 
 
