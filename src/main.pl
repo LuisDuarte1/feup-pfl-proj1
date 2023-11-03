@@ -138,7 +138,7 @@ commit_piece(Board, QFrom, RFrom, QTo, RTo, 0, NewBoard) :-
     replace_list(QFrom, 0, FromRow, FromNewRow),
     replace_list(RFrom, FromNewRow, Board, InterBoard),
     % in the destination hexagon we replace it to 0
-    nth_list(Board, RTo, ToRow),
+    nth_list(InterBoard, RTo, ToRow),
     replace_list(QTo, 0, ToRow, ToNewRow),
     replace_list(RTo, ToNewRow, InterBoard, NewBoard).
 
@@ -150,7 +150,7 @@ commit_piece(Board, QFrom, RFrom, QTo, RTo, 1, NewBoard) :-
     replace_list(QFrom, 0, FromRow, FromNewRow),
     replace_list(RFrom, FromNewRow, Board, InterBoard),
     % in the destination hexagon we replace it with the piece value
-    nth_list(Board, RTo, ToRow),
+    nth_list(InterBoard, RTo, ToRow),
     replace_list(QTo, Piece, ToRow, ToNewRow),
     replace_list(RTo, ToNewRow, InterBoard, NewBoard).
 
