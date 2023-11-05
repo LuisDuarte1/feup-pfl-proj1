@@ -8,12 +8,10 @@
 stop_game(-1, Player).
 stop_game(Player, Player) :- 
     write('You won!\n'),
-    !,
-    fail.
+    abort.
 stop_game(Player1, Player2) :- 
     write('You lost :/\n'),
-    !,
-    fail.
+    abort.
 
 invert_player(0, 1).
 invert_player(1, 0).
