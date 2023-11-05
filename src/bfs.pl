@@ -40,8 +40,9 @@ check_path_possible_bfs(Board, (Q2,R2), Visited, [(Q1,R1,Distance) | RestQueue])
     maplist(call(add_distance_to_tuple, NewDistance), IntQueue, TailQueue),
     append(RestQueue, TailQueue, NewQueue),
     format("Q: ~d R: ~d Distance: ~d Queue: ~p\n", [Q1,R1,Distance,NewQueue]),
-    check_path_possible_bfs(Board, (Q2,R2), NewVisited, NewQueue).
+    check_path_possible_bfs(Board, (Q2,R2), NewVisited, NewQueue),
+    !.
 
 check_path_possible_bfs(Board, (Q2,R2), Visited, [(Q1,R1,Distance) | RestQueue]) :- 
     format("Q: ~d R: ~d failed\n", [Q1,R1]),
-    check_path_possible_bfs(Board, (Q2,R2), Visted, RestQueue).
+    check_path_possible_bfs(Board, (Q2,R2), Visited, RestQueue).

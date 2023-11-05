@@ -39,7 +39,7 @@ run_game((Board, 0, Player)) :-
     set_prolog_flag(syntax_errors, dec10),
     draw_board(Board),
     try_move(Board, Player, NewBoard),
-    check_win_condition(Board, Player, WinCondition),
+    check_win_condition(NewBoard, Player, WinCondition),
     !,
     stop_game(WinCondition, Player),
     invert_player(Player, NewPlayer),
