@@ -3,12 +3,11 @@
 :- consult('bfs.pl').
 :- consult('hexagon.pl').
 :- consult('gamestate.pl').
+:- consult('ai.pl').
+
 
 % List access
-nth_list([H| List], 0, Out) :- Out=H.
-nth_list([H| List], Index, Out) :- 
-    NewIndex is Index-1,
-    nth_list(List, NewIndex, Out).
+nth_list(List, Index, Out) :- nth0(Index, List, Out).
 
 % List mutation
 

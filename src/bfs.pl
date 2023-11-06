@@ -28,21 +28,36 @@ check_path_possible(Board, (Q1,R1), (Q2,R2)) :-
 
 add_distance_to_tuple(Distance, (Q1,R1), ReturnTuple) :- ReturnTuple = (Q1,R1,Distance).
 
+
+flatten([], []) :- !.
+flatten([X|Xs], FlatX) :-
+    !,
+    flatten(X, NewX),
+    flatten(Xs, NewXs),
+    append(NewX, NewXs, FlatX).
+flatten(X, [X]).
+
 %in axial form
-check_path_possible_bfs(_, (Q2,R2), _, [(Q2,R2, _) | _]) :- !.
-check_path_possible_bfs(_, (Q2,R2), _, [(Q1,R1, 0) | _]) :- fail.
-check_path_possible_bfs(Board, (Q2,R2), Visited, [(Q1,R1,Distance) | RestQueue]) :-
+
+traverse_node(Board, Visited, (Q1,R1,Distance), NewList) :-
+    Distance > 0,
     neg(memberchk((Q1,R1), Visited)),
     get_adjacent(Board, Q1,R1, AdjacentList),
     NewDistance is Distance-1,
-    append([(Q1,R1)], Visited, NewVisited),
-    include(call(filter_adjacent, Board, NewVisited, (Q2,R2)), AdjacentList, IntQueue),
-    maplist(call(add_distance_to_tuple, NewDistance), IntQueue, TailQueue),
-    append(RestQueue, TailQueue, NewQueue),
-    format("Q: ~d R: ~d Distance: ~d Queue: ~p\n", [Q1,R1,Distance,NewQueue]),
-    check_path_possible_bfs(Board, (Q2,R2), NewVisited, NewQueue),
-    !.
+    include(call(filter_adjacent, Board, Visited, (Q2,R2)), AdjacentList, IntQueue),
+    maplist(call(add_distance_to_tuple, NewDistance), IntQueue, NewList)
+    .
 
-check_path_possible_bfs(Board, (Q2,R2), Visited, [(Q1,R1,Distance) | RestQueue]) :- 
-    format("Q: ~d R: ~d failed\n", [Q1,R1]),
-    check_path_possible_bfs(Board, (Q2,R2), Visited, RestQueue).
+got_destination_node((Q2,R2), (Q2,R2,_)).
+
+check_path_possible_bfs(_, _, _, []) :- fail.
+check_path_possible_bfs(_, (Q2,R2), _, List) :- 
+    memberchk((Q2,R2,_), List), !.
+check_path_possible_bfs(Board, (Q2,R2), Visited, List) :-
+    proper_length(List, Length),
+    Length > 0,
+    maplist(call(traverse_node, Board, Visited), List, Results),
+    flatten(Results, ResultsFlat),
+    append(List, Visited, NewVisted),
+    check_path_possible_bfs(Board, (Q2,R2), NewVisted, ResultsFlat)
+    .

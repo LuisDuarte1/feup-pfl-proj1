@@ -43,3 +43,35 @@ run_game((Board, 0, Player)) :-
     invert_player(Player, NewPlayer),
     run_game((NewBoard, 0, NewPlayer))
     .
+
+% run game with random ai -> consult('src/main.pl'), init_board(_Board), run_game((_Board,0,0)).
+% +GameState
+run_game((Board, 0, Player)) :-
+    set_prolog_flag(syntax_errors, dec10),
+    draw_board(Board),
+    try_move(Board, Player, NewBoard),
+    check_win_condition(NewBoard, Player, WinCondition),
+    !,
+    stop_game(WinCondition, Player),
+    invert_player(Player, NewPlayer),
+    run_game((NewBoard, 0, NewPlayer))
+    .
+
+% on type 1, we have a random move AI
+% player 0 - human player; player 1 - AI
+% test game with random ai -> consult('src/main.pl'), init_board(_Board), run_game((_Board,1,0)).
+% +GameState
+run_game((Board, 1, 0)) :- 
+    set_prolog_flag(syntax_errors, dec10),
+    draw_board(Board),
+    try_move(Board, 0, NewBoard),
+    check_win_condition(NewBoard, 0, WinCondition),
+    !,
+    stop_game(WinCondition, 0),
+    run_game((NewBoard, 1, 1)).
+
+run_game((Board, 1, 1)) :-
+    random_move_ai(Board, 1, NewBoard),
+    check_win_condition(NewBoard, 1, WinCondition),
+    stop_game(WinCondition, 1),
+    run_game((NewBoard, 1, 0)).
