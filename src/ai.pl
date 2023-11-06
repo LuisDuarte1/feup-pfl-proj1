@@ -38,3 +38,46 @@ random_move_ai(Board, Player, NewBoard) :-
     convert_offset_to_axial(Q2,R2,QTo, RTo),
     move_piece(Board, QFrom, RFrom, QTo, RTo, NewBoard, Player)
     .
+
+
+filter_golden_move((Q1,R1)-(5,1)).
+filter_golden_move((Q1,R1)-(5,5)).
+filter_golden_move((Q1,R1)-(Q2,R2)) :- fail.
+
+
+value(0, Board, Value):-
+    check_win_condition(Board, Player, State),
+    State =:= 0,
+    Value is -100.
+
+value(1, Board, Value):-
+    check_win_condition(Board, Player, State),
+    State =:= 1,
+    Value is 100.
+
+value(Player,Board, Value):-
+    check_win_condition(Board, Player, State),
+    State =:= -1,
+    find_all_valid_moves(Board, Player, OwnPlayerMoves),
+    include(filter_golden_move, OwnPlayerMoves, OwnGoldenMoves),
+    invert_player(Player, EnemyPlayer),
+    find_all_valid_moves(Board, EnemyPlayer, EnemyPlayerMoves),
+    include(filter_golden_move, EnemyPlayerMoves, EnemyGoldenMoves),
+    proper_length(OwnGoldenMoves, OwnMoves),
+    proper_length(EnemyGoldenMoves, EnemyMoves),
+    Value is OwnMoves - EnemyMoves.
+
+make_greedy_move(Player, Board,(Q1,R1)-(Q2,R2),NewBoard) :-
+    convert_offset_to_axial(Q1,R1,QFrom, RFrom),
+    convert_offset_to_axial(Q2,R2,QTo, RTo),
+    move_piece(Board, QFrom, RFrom, QTo, RTo, NewBoard, Player).
+
+cmp_evalboards((_, Eval1), (_, Eval2)) :- Eval1 =< Eval2.
+
+greedy_ai(Board, Player, NewBoard) :- 
+    find_all_valid_moves(Board, Player, Moves),
+    maplist(call(make_greedy_move, Player, Board), Moves, NewBoards),
+    maplist(call(value, Player), NewBoards, Evals),
+    zip(NewBoards, Evals, EvalBoards),
+    max_member(cmp_evalboards, (NewBoard,_), EvalBoards).
+

@@ -4,7 +4,9 @@
 :- consult('hexagon.pl').
 :- consult('gamestate.pl').
 :- consult('ai.pl').
+:- consult('menu.pl').
 
+play :- menu.
 
 % List access
 nth_list(List, Index, Out) :- nth0(Index, List, Out).
@@ -24,6 +26,10 @@ find_list([Head | List], Element) :- find_list(List, Element).
 % negation of predicate
 neg(Goal) :- Goal,!,fail.
 neg(Goal).
+
+%list zip
+zip([], [], []).
+zip([X|Xs], [Y|Ys], [(X,Y)|Zs]) :- zip(Xs,Ys,Zs).
 
 /*
  board:
@@ -119,6 +125,10 @@ attack_checker(X,0,1).
 % piece belongs to player
 belongs_player(0, Piece) :- Piece =< 5.
 belongs_player(1, Piece) :- Piece > 5.
+
+%piece same team
+same_team_piece(Piece1, Piece2) :- Piece1 =< 5, Piece2 =< 5.
+same_team_piece(Piece1, Piece2) :- Piece1 > 5, Piece2 > 5.
 
 
 % distance function

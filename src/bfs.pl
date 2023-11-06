@@ -17,7 +17,9 @@ get_adjacent(Board, Q1, R1, AdjacentList) :-
 %in axial form
 filter_adjacent(Board, Visited, (Q2,R2), (Q2,R2)).
 filter_adjacent(Board, Visited, (Q2,R2), (Qi,Ri)) :- 
-    get_board_piece_axial(Board, Qi, Ri, Piece), Piece = 0, neg(memberchk((Qi,Ri), Visited)). 
+    get_board_piece_axial(Board, Qi, Ri, Piece), Piece > -1,
+    get_board_piece_axial(Board, Q2, R2, Piece2), (Piece2 =:= 0; neg(same_team_piece(Piece, Piece2))),
+    neg(memberchk((Qi,Ri), Visited)). 
 
 %in axial form
 check_path_possible(Board, (Q1,R1), (Q2,R2)) :-
@@ -39,7 +41,7 @@ flatten(X, [X]).
 
 %in axial form
 
-traverse_node(Board, Visited, (Q1,R1,Distance), NewList) :-
+traverse_node(Board, Visited, (Q2,R2), (Q1,R1,Distance), NewList) :-
     Distance > 0,
     neg(memberchk((Q1,R1), Visited)),
     get_adjacent(Board, Q1,R1, AdjacentList),
@@ -56,8 +58,9 @@ check_path_possible_bfs(_, (Q2,R2), _, List) :-
 check_path_possible_bfs(Board, (Q2,R2), Visited, List) :-
     proper_length(List, Length),
     Length > 0,
-    maplist(call(traverse_node, Board, Visited), List, Results),
+    maplist(call(traverse_node, Board, Visited, (Q2,R2)), List, Results),
     flatten(Results, ResultsFlat),
     append(List, Visited, NewVisted),
+    %format("~p\n", [ResultsFlat]),
     check_path_possible_bfs(Board, (Q2,R2), NewVisted, ResultsFlat)
     .

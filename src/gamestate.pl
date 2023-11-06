@@ -75,3 +75,22 @@ run_game((Board, 1, 1)) :-
     check_win_condition(NewBoard, 1, WinCondition),
     stop_game(WinCondition, 1),
     run_game((NewBoard, 1, 0)).
+
+
+%minimax AI type 2
+% +GameState
+% test game with minimax ai -> consult('src/main.pl'), init_board(_Board), run_game((_Board,2,0)).
+run_game((Board, 2, 0)) :- 
+    set_prolog_flag(syntax_errors, dec10),
+    draw_board(Board),
+    try_move(Board, 0, NewBoard),
+    check_win_condition(NewBoard, 0, WinCondition),
+    !,
+    stop_game(WinCondition, 0),
+    run_game((NewBoard, 2, 1)).
+
+run_game((Board, 2, 1)) :-
+    greedy_ai(Board, 1, NewBoard),
+    check_win_condition(NewBoard, 1, WinCondition),
+    stop_game(WinCondition, 1),
+    run_game((NewBoard, 2, 0)).
