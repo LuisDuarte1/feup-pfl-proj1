@@ -44,7 +44,7 @@ The offset coordinates are an array of arrays used to store the board state.
 
 The representation of the pieces is related to the number of sides that it has. A red circle piece, for example, is represented as a 1 in the array of arrays. However, a blue circle piece is represented as a 6 (with an offset of 5), to distinguish it from a red circle piece.
 
-![offset coord.png](images/offset coord.png)
+![offset coord.png](images/offsetcoord.png)
 
 ### Axial Coordinates
 
@@ -52,13 +52,13 @@ The axial coordinates are inspired by the diagonal plane of a cube. A plane can 
 
 This coordinate system is used to calculate distances and make any sort of calculations related to positions.
 
-![axial coord.png](images/axial coord.png)
+![axial coord.png](images/axialcoord.png)
 
 ### Algebraic Coordinates
 
 The last coordinate system is the algebraic coordinate system. It is inspired by the chess coordinates (with a letter and a number) and it is used during the game by the player to identify which piece they want to move and where to.
 
-![algebraic coord.png](images/algebraic coord.png)
+![algebraic coord.png](images/algebraiccoord.png)
 
 ## Game state visualization
 
