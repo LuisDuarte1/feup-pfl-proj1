@@ -21,7 +21,7 @@ A player wins the game if they are occupying both the gold tiles after the opone
 
 There are 4 different kinds of pieces in the game - the circle, the triangle, the square and the pentagon. Each piece can move up to the number of sides that it has, per turn (eg. a square can move up to 4 tiles in a turn).  They are displayed in the board as such:
 
-![layout.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/09fb57e0-7025-489f-a28f-9b24f9d0494e/2e6a1e39-c602-4f57-97f3-73b8a6e1c664/layout.png)
+![layout.png](images/layout.png)
 
 When it comes to taking the oponents pieces, there are some rules to it. Depending on which kind of piece is taking another, the attacking piece might have to be removed from the board, or not be allowed to take the oponents piece at all. We can see that in the table below.
 
@@ -44,7 +44,7 @@ The offset coordinates are an array of arrays used to store the board state.
 
 The representation of the pieces is related to the number of sides that it has. A red circle piece, for example, is represented as a 1 in the array of arrays. However, a blue circle piece is represented as a 6 (with an offset of 5), to distinguish it from a red circle piece.
 
-![offset coord.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/09fb57e0-7025-489f-a28f-9b24f9d0494e/8c8a3f97-f2fa-402f-a088-e1e9be42e7c5/offset_coord.png)
+![offset coord.png](images/offset coord.png)
 
 ### Axial Coordinates
 
@@ -52,13 +52,13 @@ The axial coordinates are inspired by the diagonal plane of a cube. A plane can 
 
 This coordinate system is used to calculate distances and make any sort of calculations related to positions.
 
-![axial coord.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/09fb57e0-7025-489f-a28f-9b24f9d0494e/8453f887-22a8-4e42-b28d-6c49dde96694/axial_coord.png)
+![axial coord.png](images/axial coord.png)
 
 ### Algebraic Coordinates
 
 The last coordinate system is the algebraic coordinate system. It is inspired by the chess coordinates (with a letter and a number) and it is used during the game by the player to identify which piece they want to move and where to.
 
-![algebraic coord.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/09fb57e0-7025-489f-a28f-9b24f9d0494e/c1998624-5130-47fe-931a-609e33ebe5a1/algebraic_coord.png)
+![algebraic coord.png](images/algebraic coord.png)
 
 ## Game state visualization
 
