@@ -15,17 +15,17 @@ get_adjacent(Board, Q1, R1, AdjacentList) :-
     include(call(check_tile_does_exist, Board), IntermediateList, AdjacentList).
 
 %in axial form
-filter_adjacent(Board, Visited, (Q2,R2), (Q2,R2)).
-filter_adjacent(Board, Visited, (Q2,R2), (Qi,Ri)) :- 
+filter_adjacent(Board, Visited, (Q2,R2), PieceValue, (Q2,R2)).
+filter_adjacent(Board, Visited, (Q2,R2), PieceValue, (Qi,Ri)) :- 
     get_board_piece_axial(Board, Qi, Ri, Piece), Piece > -1,
-    get_board_piece_axial(Board, Q2, R2, Piece2), (Piece2 =:= 0; neg(same_team_piece(Piece, Piece2))),
+    (Piece =:= 0; neg(same_team_piece(PieceValue, Piece))),
     neg(memberchk((Qi,Ri), Visited)). 
 
 %in axial form
 check_path_possible(Board, (Q1,R1), (Q2,R2)) :-
     get_board_piece_axial(Board, Q1, R1, Piece),  
     normalize_board_piece(Piece, NormalizedPiece),
-    check_path_possible_bfs(Board, (Q2,R2), [], [(Q1,R1,NormalizedPiece)]).
+    check_path_possible_bfs(Board, (Q2,R2), Piece, [], [(Q1,R1,NormalizedPiece)]).
 
 
 add_distance_to_tuple(Distance, (Q1,R1), ReturnTuple) :- ReturnTuple = (Q1,R1,Distance).
@@ -41,26 +41,25 @@ flatten(X, [X]).
 
 %in axial form
 
-traverse_node(Board, Visited, (Q2,R2), (Q1,R1,Distance), NewList) :-
+traverse_node(Board, Visited, (Q2,R2), PieceValue, (Q1,R1,Distance), NewList) :-
     Distance > 0,
     neg(memberchk((Q1,R1), Visited)),
     get_adjacent(Board, Q1,R1, AdjacentList),
     NewDistance is Distance-1,
-    include(call(filter_adjacent, Board, Visited, (Q2,R2)), AdjacentList, IntQueue),
+    include(call(filter_adjacent, Board, Visited, (Q2,R2), PieceValue), AdjacentList, IntQueue),
     maplist(call(add_distance_to_tuple, NewDistance), IntQueue, NewList)
     .
 
 got_destination_node((Q2,R2), (Q2,R2,_)).
 
-check_path_possible_bfs(_, _, _, []) :- fail.
-check_path_possible_bfs(_, (Q2,R2), _, List) :- 
+check_path_possible_bfs(_, _, _, _, []) :- fail.
+check_path_possible_bfs(_, (Q2,R2), _, _, List) :- 
     memberchk((Q2,R2,_), List), !.
-check_path_possible_bfs(Board, (Q2,R2), Visited, List) :-
+check_path_possible_bfs(Board, (Q2,R2), PieceValue, Visited, List) :-
     proper_length(List, Length),
     Length > 0,
-    maplist(call(traverse_node, Board, Visited, (Q2,R2)), List, Results),
+    maplist(call(traverse_node, Board, Visited, (Q2,R2), PieceValue), List, Results),
     flatten(Results, ResultsFlat),
     append(List, Visited, NewVisted),
-    %format("~p\n", [ResultsFlat]),
-    check_path_possible_bfs(Board, (Q2,R2), NewVisted, ResultsFlat)
+    check_path_possible_bfs(Board, (Q2,R2), PieceValue, NewVisted, ResultsFlat)
     .
