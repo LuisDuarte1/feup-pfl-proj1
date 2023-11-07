@@ -59,7 +59,8 @@ check_path_possible_bfs(Board, (Q2,R2), PieceValue, Visited, List) :-
     proper_length(List, Length),
     Length > 0,
     maplist(call(traverse_node, Board, Visited, (Q2,R2), PieceValue), List, Results),
-    flatten(Results, ResultsFlat),
+    flatten(Results, _ResultsFlat),
+    list_to_ord_set(_ResultsFlat, ResultsFlat),
     append(List, Visited, NewVisted),
     check_path_possible_bfs(Board, (Q2,R2), PieceValue, NewVisted, ResultsFlat)
     .
